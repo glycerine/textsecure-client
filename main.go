@@ -124,7 +124,6 @@ func messageHandler(msg *ts.Message) {
 func inputHandler( inputWin *gc.Window) {
     var c gc.Char
     var rawInput gc.Key
-    var err error
     max_y, max_x := inputWin.MaxYX()
     for {
         rawInput = inputWin.GetChar()
@@ -168,19 +167,7 @@ func inputHandler( inputWin *gc.Window) {
                 inputWin.Move(y+1,x)
             }
         } else if rawInput == gc.KEY_RETURN {
-            //SEND THE MESSAGE HERE WE GO BOYS AND GIRLS!
-            if len(inputBuffer) != 0 {
-                msg := string(inputBuffer)
-                to := string("+12345567890")
-                debugLog.Println(msg)
-                debugLog.Println(to)
-                err = ts.SendMessage(to,msg)
-                if err != nil {
-                    gc.End()
-                    log.Fatal("SendMessage failed yo: ",err)
-                }
-
-            }
+            clearScrSendMsg(inputWin)
         } else if rawInput == gc.KEY_SRIGHT {
             inputWin.Print("\n")
             inputBuffer = append(inputBuffer,byte(10))
@@ -192,6 +179,22 @@ func inputHandler( inputWin *gc.Window) {
         }
     }
 
+}
+
+func clearScrSendMsg (inputWin *gc.Window) {
+   if len(inputBuffer) != 0 {
+       msg := string(inputBuffer)
+       to := string("+12345678910")
+       //debugLog.Println(msg)
+       //debugLog.Println(to)
+       err := ts.SendMessage(to,msg)
+       if err != nil {
+           gc.End()
+           log.Fatal("SendMessage failed yo: ",err)
+       }
+       inputBuffer = []byte{}
+       inputWin.Erase()
+   }
 }
 
 //creates a curses based TUI for the textsecure library
