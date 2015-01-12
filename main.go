@@ -1,12 +1,12 @@
 package main
 
 import (
-	"flag"
+	//"flag"
 	"fmt"
-	"io/ioutil"
-	"strings"
+//	"io/ioutil"
+//	"strings"
     //janimo's textsecure library. Documentation here: https://godoc.org/github.com/janimo/textsecure
-	"github.com/janimo/textsecure"
+//	"github.com/janimo/textsecure"
     "os"
     "log"
     //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
