@@ -1,35 +1,20 @@
+// Copyright (c) 2014  by f4lk0r_ 
+// Licensed under the GPLv3, see the License.txt file for details
+
 package main
 
 import (
-	"fmt"
     //janimo's textsecure library. Documentation here: https://godoc.org/github.com/janimo/textsecure
 	ts "github.com/janimo/textsecure"
-    "os"
-    "log"
     //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
     gc "code.google.com/p/goncurses"
+
+    "log"
 )
 
 //var telToName map[string]string
-var debugLog = startDebugLogger()
+//var debugLog = startDebugLogger()
 var inputBuffer []byte
-
-// This is here for conveniences sake when testing
-// The default, built-in logging package in Go does not have the ability to log out to a file.
-// I hate this crap language with the fiery passion of a thousand suns
-func startDebugLogger() *log.Logger {
-    file, err := os.OpenFile("debug.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-    if err != nil {
-        fmt.Println("Failed to open log file", ":", err)
-        panic(err)
-        return nil
-    }
-
-    MyFile := log.New(file,
-        "PREFIX: ",
-        log.Ldate|log.Ltime|log.Lshortfile)
-    return MyFile
-}
 
 //sets up the initial configuration of curses. Keeps code in main cleaner.
 func configCurses(stdscr *gc.Window) {
@@ -181,6 +166,7 @@ func inputHandler( inputWin *gc.Window) {
 
 }
 
+// In addition to sending a message using janimo's library, also clears screen and resets buffer
 func clearScrSendMsg (inputWin *gc.Window) {
    if len(inputBuffer) != 0 {
        msg := string(inputBuffer)
