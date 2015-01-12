@@ -1,3 +1,10 @@
 how to solve whitespace in the textbox vs the buffer with the arrow keys?
-more contacts than fit on the screen (pad)
+    Idea: keep a placeholder value in the buffer that you increment/decrement for left/right
+    up + down increments by the length of the input screen (can we find that? window.maxYX function)
+more contacts than fit on the screen 
+    pad instead of window
 delete doesn't wrap around right
+    debug this shit
+maybe hunt down what was causing that segfault and offer a patch?
+    disable the initialization, the session was null because we didn't initalize.
+    store.go line 315 segfaults because session is null

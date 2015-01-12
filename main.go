@@ -120,40 +120,11 @@ func messageHandler(msg *ts.Message) {
     return
 }
 
-//creates a curses based TUI for the textsecure library
-func main() {
-    stdscr, err := gc.Init()
-    client := &ts.Client{
-        RootDir:        ".",
-        ReadLine:       ts.ConsoleReadLine,
-        MessageHandler: messageHandler,
-    }
-    ts.Setup(client)
-    if err != nil {
-        log.Fatal("Error initializing curses:", err)
-    }
-    defer gc.End()
-    configCurses(stdscr)
-
-    //Hello dialog. So the nooblets know the controls
-    stdscr.Refresh()
-    stdscr.MovePrintln(5,5, "Controls:")
-    stdscr.Println("Escape: Exits the program.")
-    stdscr.Println("Tab: Switches between the input window and the Message window.")
-    stdscr.Println("Return: Sends a message")
-    stdscr.Println(`Shift + Right/Left: puts in a new line '\n' character (like shift+return in facebook chat)`)
-    stdscr.Println("Press any key to continue...")
-    stdscr.GetChar()
-    stdscr.Clear()
-    stdscr.Refresh()
-
-    contactsWin, messageWin, inputBorderWin, inputWin := createMainWindows(stdscr)
-    messageWin.Refresh()
-    inputBorderWin.Refresh()
-    contactsWin.Refresh()
-    inputWin.Move(0,0)
+// handles keyboard input
+func inputHandler( inputWin *gc.Window) {
     var c gc.Char
     var rawInput gc.Key
+    var err error
     max_y, max_x := inputWin.MaxYX()
     for {
         rawInput = inputWin.GetChar()
@@ -200,7 +171,7 @@ func main() {
             //SEND THE MESSAGE HERE WE GO BOYS AND GIRLS!
             if len(inputBuffer) != 0 {
                 msg := string(inputBuffer)
-                to := string("+12345678910")
+                to := string("+12345567890")
                 debugLog.Println(msg)
                 debugLog.Println(to)
                 err = ts.SendMessage(to,msg)
@@ -208,14 +179,52 @@ func main() {
                     gc.End()
                     log.Fatal("SendMessage failed yo: ",err)
                 }
+
             }
         } else if rawInput == gc.KEY_SRIGHT {
             inputWin.Print("\n")
             inputBuffer = append(inputBuffer,byte(10))
+        } else if rawInput == gc.KEY_SLEFT {
         } else {
             inputWin.Print(string(c))
             inputBuffer = append(inputBuffer,byte(c))
             //debugLog.Println(inputBuffer)
         }
     }
+
+}
+
+//creates a curses based TUI for the textsecure library
+func main() {
+    stdscr, err := gc.Init()
+    client := &ts.Client{
+        RootDir:        ".",
+        ReadLine:       ts.ConsoleReadLine,
+        MessageHandler: messageHandler,
+    }
+    ts.Setup(client)
+    if err != nil {
+        log.Fatal("Error initializing curses:", err)
+    }
+    defer gc.End()
+    configCurses(stdscr)
+
+    //Hello dialog. So the nooblets know the controls
+    stdscr.Refresh()
+    stdscr.MovePrintln(5,5, "Controls:")
+    stdscr.Println("Escape: Exits the program.")
+    stdscr.Println("Tab: Switches between the input window and the Message window.")
+    stdscr.Println("Return: Sends a message")
+    stdscr.Println(`Shift + Right Arrow: puts in a new line '\n' character (like shift+return in facebook chat)`)
+    stdscr.Println("Press any key to continue...")
+    stdscr.GetChar()
+    stdscr.Clear()
+    stdscr.Refresh()
+
+    contactsWin, messageWin, inputBorderWin, inputWin := createMainWindows(stdscr)
+    messageWin.Refresh()
+    inputBorderWin.Refresh()
+    contactsWin.Refresh()
+    inputWin.Move(0,0)
+    inputHandler(inputWin)
 }
