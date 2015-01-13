@@ -11,5 +11,7 @@ maybe hunt down what was causing that segfault and offer a patch?
 Make an AddressBook frontEnd for .config/contacts.yml
 Make mapping "g" to go to top of contacts list "G" to go to bottom of contacts list 
 
+Fix Backspace not showing up correctly
+
 LOW PRIORITY:
     Idea: Make a confirmation icon to ensure that the message has been sent
