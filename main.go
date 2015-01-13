@@ -198,16 +198,9 @@ func makeMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *g
 
 // creates a curses based TUI for the textsecure library
 func main() {
-    // config := &ts.Config{
-    //     Tel:               `yaml:"tel"`,
-    //     Server:            `yaml:"server"`,
-    //     VerificationType:  `yaml:"verificationType"`,
-
-    // }
     client := &ts.Client{
         RootDir:        ".",
         ReadLine:       ts.ConsoleReadLine,
-        // GetConfig:      *config,
         MessageHandler: messageHandler,
     }
     ts.Setup(client)
