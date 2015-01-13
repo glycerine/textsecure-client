@@ -198,13 +198,20 @@ func makeMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *g
 
 // creates a curses based TUI for the textsecure library
 func main() {
-    stdscr, err := gc.Init()
+    // config := &ts.Config{
+    //     Tel:               `yaml:"tel"`,
+    //     Server:            `yaml:"server"`,
+    //     VerificationType:  `yaml:"verificationType"`,
+
+    // }
     client := &ts.Client{
         RootDir:        ".",
         ReadLine:       ts.ConsoleReadLine,
+        // GetConfig:      *config,
         MessageHandler: messageHandler,
     }
     ts.Setup(client)
+    stdscr, err := gc.Init()
     if err != nil {
         log.Fatal("Error initializing curses:", err)
     }
