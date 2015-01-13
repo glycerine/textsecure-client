@@ -5,7 +5,7 @@
 Installation
 ------------
 
-    go get github.com/pwnedsu/textsecure-client
+    go get github.com/f4lk0r/textsecure-client
 
 For more details, including setting up Go, check out janimo's [wiki] (https://github.com/janimo/textsecure/wiki/Installation)
 
