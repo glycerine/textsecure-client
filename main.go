@@ -8,8 +8,8 @@ import (
 	ts "github.com/janimo/textsecure"
     //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
     gc "code.google.com/p/goncurses"
-
     "log"
+//    "reflect"
 )
 
 //var telToName map[string]string
@@ -195,6 +195,42 @@ func doHello( stdscr *gc.Window) {
     stdscr.Refresh()
 }
 
+// free memory for various things at the end of the program
+func cleanup (menu_items []*gc.MenuItem, contactMenu *gc.Menu) {
+    for i:=0; i <len(menu_items); i++  {
+            menu_items[i].Free()
+    }
+    contactMenu.UnPost()
+    contactMenu.Free()
+}
+
+// makes the menu inside the contacts window
+func makeMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *gc.Menu, *gc.Window)  {
+    menu_items := make([]*gc.MenuItem, len(contacts))
+    var err error
+    for i, val := range contacts {
+        menu_items[i], err = gc.NewItem((val.Name), "")
+        if err != nil {
+            log.Fatal("Error making item for contact menu... ", err)
+        }
+    }
+    contactMenu, err := gc.NewMenu(menu_items)
+    if err != nil {
+        log.Fatal("Error making contact menu... ", err)
+    }
+    contactsWinSizeY, contactsWinSizeX := contactsWin.MaxYX()
+    contactsWin.Keypad(true)
+    contactsMenuWin := contactsWin.Derived((contactsWinSizeY-5),(contactsWinSizeX-2),3,1)
+    contactMenu.SetWindow(contactsMenuWin)
+    contactMenu.Format(5,1)
+    contactMenu.Mark(" * ")
+
+    title := "Contacts"
+    contactsWin.MovePrint(1, (contactsWinSizeX/2)-(len(title)/2), title)
+    contactsWin.HLine(2, 1, '-', contactsWinSizeX-2)
+    return menu_items, contactMenu, contactsMenuWin
+}
+
 
 // creates a curses based TUI for the textsecure library
 func main() {
@@ -217,40 +253,16 @@ func main() {
         log.Fatal("Could not get contacts: %s\n", err)
     }
 
-    menu_items := make([]*gc.MenuItem, len(contacts))
-    for i, val := range contacts {
-        menu_items[i], err = gc.NewItem((val.Name), "")
-        if err != nil {
-            log.Fatal("Error making item for contact menu... ", err)
-        }
-        defer menu_items[i].Free()
-    }
-    contactMenu, err := gc.NewMenu(menu_items)
-    if err != nil {
-        log.Fatal("Error making contact menu... ", err)
-    }
-    defer contactMenu.Free()
-
     contactsWin, messageWin, inputBorderWin, inputWin := createMainWindows(stdscr)
+    menu_items, contactMenu, contactsMenuWin := makeMenu(contacts, contactsWin)
 
-    contactsWinSizeY, contactsWinSizeX := contactsWin.MaxYX()
-    contactsWin.Keypad(true)
-    contactsMenuWin := contactsWin.Derived((contactsWinSizeY-5),(contactsWinSizeX-2),3,1)
-    contactMenu.SetWindow(contactsMenuWin)
-    contactMenu.Format(5,1)
-    contactMenu.Mark(" * ")
-
-    title := "Contacts"
-    contactsWin.MovePrint(1, (contactsWinSizeX/2)-(len(title)/2), title)
-    contactsWin.HLine(2, 1, '-', contactsWinSizeX-2)
-
+    contactsMenuWin.Touch()
     contactMenu.Post()
-    defer contactMenu.UnPost()
     contactsWin.Refresh()
-
     messageWin.Refresh()
     inputBorderWin.Refresh()
 
     inputWin.Move(0,0)
     inputHandler(inputWin, stdscr)
+    cleanup(menu_items, contactMenu)
 }
