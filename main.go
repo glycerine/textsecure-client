@@ -13,7 +13,7 @@ import (
 )
 
 //var telToName map[string]string
-//var debugLog = startDebugLogger()
+var debugLog = startDebugLogger()
 var inputBuffer []byte
 
 //sets up the initial configuration of curses. Keeps code in main cleaner.
@@ -47,7 +47,7 @@ func configCurses(stdscr *gc.Window) {
 }
 
 //creates the three Main big windows that make up the GUI
-func createMainWindows(stdscr *gc.Window ) (*gc.Window, *gc.Window, *gc.Window, *gc.Window) {
+func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *gc.Window) {
     rows, cols := stdscr.MaxYX()
     height, width := rows,int(float64(cols) * .2)
 
@@ -106,7 +106,7 @@ func messageHandler(msg *ts.Message) {
 }
 
 // handles keyboard input
-func inputHandler( inputWin *gc.Window) {
+func inputHandler( inputWin *gc.Window, stdscr *gc.Window) {
     var c gc.Char
     var rawInput gc.Key
     max_y, max_x := inputWin.MaxYX()
@@ -168,22 +168,35 @@ func inputHandler( inputWin *gc.Window) {
 
 // In addition to sending a message using janimo's library, also clears screen and resets buffer
 func clearScrSendMsg (inputWin *gc.Window) {
-   if len(inputBuffer) != 0 {
-       msg := string(inputBuffer)
-       to := string("+12345678910")
-       //debugLog.Println(msg)
-       //debugLog.Println(to)
-       err := ts.SendMessage(to,msg)
-       if err != nil {
-           gc.End()
-           log.Fatal("SendMessage failed yo: ",err)
-       }
-       inputBuffer = []byte{}
-       inputWin.Erase()
-   }
+    if len(inputBuffer) != 0 {
+        msg := string(inputBuffer)
+        to := string("+12345678910")
+        err := ts.SendMessage(to,msg)
+        if err != nil {
+            gc.End()
+            log.Fatal("SendMessage failed yo: ",err)
+        }
+        inputBuffer = []byte{}
+        inputWin.Erase()
+    }
 }
 
-//creates a curses based TUI for the textsecure library
+// Hello dialog. So the nooblets know the controls
+func doHello( stdscr *gc.Window) {
+    stdscr.Refresh()
+    stdscr.MovePrintln(5,5, "Controls:")
+    stdscr.Println("Escape: Exits the program.")
+    stdscr.Println("Tab: Switches between the input window and the Message window.")
+    stdscr.Println("Return: Sends a message")
+    stdscr.Println(`Shift + Right Arrow: puts in a new line '\n' character (like shift+return in facebook chat)`)
+    stdscr.Println("Press any key to continue...")
+    stdscr.GetChar()
+    stdscr.Clear()
+    stdscr.Refresh()
+}
+
+
+// creates a curses based TUI for the textsecure library
 func main() {
     stdscr, err := gc.Init()
     client := &ts.Client{
@@ -197,23 +210,47 @@ func main() {
     }
     defer gc.End()
     configCurses(stdscr)
+    doHello(stdscr)
 
-    //Hello dialog. So the nooblets know the controls
-    stdscr.Refresh()
-    stdscr.MovePrintln(5,5, "Controls:")
-    stdscr.Println("Escape: Exits the program.")
-    stdscr.Println("Tab: Switches between the input window and the Message window.")
-    stdscr.Println("Return: Sends a message")
-    stdscr.Println(`Shift + Right Arrow: puts in a new line '\n' character (like shift+return in facebook chat)`)
-    stdscr.Println("Press any key to continue...")
-    stdscr.GetChar()
-    stdscr.Clear()
-    stdscr.Refresh()
+    contacts, err := ts.GetRegisteredContacts()
+    if err != nil {
+        log.Fatal("Could not get contacts: %s\n", err)
+    }
+
+    menu_items := make([]*gc.MenuItem, len(contacts))
+    for i, val := range contacts {
+        menu_items[i], err = gc.NewItem((val.Name), "")
+        if err != nil {
+            log.Fatal("Error making item for contact menu... ", err)
+        }
+        defer menu_items[i].Free()
+    }
+    contactMenu, err := gc.NewMenu(menu_items)
+    if err != nil {
+        log.Fatal("Error making contact menu... ", err)
+    }
+    defer contactMenu.Free()
 
     contactsWin, messageWin, inputBorderWin, inputWin := createMainWindows(stdscr)
+
+    contactsWinSizeY, contactsWinSizeX := contactsWin.MaxYX()
+    contactsWin.Keypad(true)
+    contactsMenuWin := contactsWin.Derived((contactsWinSizeY-5),(contactsWinSizeX-2),3,1)
+    contactMenu.SetWindow(contactsMenuWin)
+    contactMenu.Format(5,1)
+    contactMenu.Mark(" * ")
+
+    title := "Contacts"
+    contactsWin.MovePrint(1, (contactsWinSizeX/2)-(len(title)/2), title)
+    contactsWin.HLine(2, 1, '-', contactsWinSizeX-2)
+
+    contactMenu.Post()
+    defer contactMenu.UnPost()
+    contactsWin.Refresh()
+
     messageWin.Refresh()
     inputBorderWin.Refresh()
-    contactsWin.Refresh()
+
     inputWin.Move(0,0)
-    inputHandler(inputWin)
+    inputHandler(inputWin, stdscr)
 }
