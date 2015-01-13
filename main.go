@@ -105,66 +105,6 @@ func messageHandler(msg *ts.Message) {
     return
 }
 
-// handles keyboard input
-func inputHandler( inputWin *gc.Window, stdscr *gc.Window) {
-    var c gc.Char
-    var rawInput gc.Key
-    max_y, max_x := inputWin.MaxYX()
-    for {
-        rawInput = inputWin.GetChar()
-        c = gc.Char(rawInput)
-        //debugLog.Println(rawInput)
-        //debugLog.Println(c)
-
-        //Escape to Quit
-        if c == gc.Char(27) {
-            break
-        } else if rawInput == gc.KEY_BACKSPACE {
-            //Delete Key
-            y,x := inputWin.CursorYX()
-            if x != 0 {
-                inputWin.MoveDelChar(y,x-1)
-                inputBuffer = inputBuffer[0:len(inputBuffer)-1]
-                //debugLog.Println(inputBuffer)
-            } else {
-                inputWin.MoveDelChar(y-1,max_x)
-                inputBuffer = inputBuffer[0:len(inputBuffer)-1]
-                //debugLog.Println(inputBuffer)
-            }
-        } else if c == gc.KEY_LEFT {
-            y,x := inputWin.CursorYX()
-            if x != 0 {
-                inputWin.Move(y,x-1)
-            }
-        } else if c == gc.KEY_RIGHT {
-            y,x := inputWin.CursorYX()
-            if x != max_x {
-                inputWin.Move(y,x+1)
-            }
-        } else if c == gc.KEY_UP {
-            y,x := inputWin.CursorYX()
-            if y != 0 {
-                inputWin.Move(y-1,x)
-            }
-        } else if c == gc.KEY_DOWN {
-            y,x := inputWin.CursorYX()
-            if y != max_y {
-                inputWin.Move(y+1,x)
-            }
-        } else if rawInput == gc.KEY_RETURN {
-            clearScrSendMsg(inputWin)
-        } else if rawInput == gc.KEY_SRIGHT {
-            inputWin.Print("\n")
-            inputBuffer = append(inputBuffer,byte(10))
-        } else if rawInput == gc.KEY_SLEFT {
-        } else {
-            inputWin.Print(string(c))
-            inputBuffer = append(inputBuffer,byte(c))
-            //debugLog.Println(inputBuffer)
-        }
-    }
-
-}
 
 // In addition to sending a message using janimo's library, also clears screen and resets buffer
 func clearScrSendMsg (inputWin *gc.Window) {
@@ -263,6 +203,6 @@ func main() {
     inputBorderWin.Refresh()
 
     inputWin.Move(0,0)
-    inputHandler(inputWin, stdscr)
+    inputHandler(inputWin, stdscr, contactsMenuWin, contactMenu)
     cleanup(menu_items, contactMenu)
 }
