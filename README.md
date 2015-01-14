@@ -14,12 +14,12 @@ For more details, including setting up Go, check out janimo's [wiki] (https://gi
 Configuration
 -------------
 
-This cannot be configured YET. The best you can do is configure in janimo's cmd/textsecure folder and then copy and paste the .storage and .config directories over to this folder.
+Before starting the Application for the first time, go into the .config directory and edit contacts.yml and config.yml to your liking. You should then have everything you need to get started.
 
 Usage
 -----
 
-This doesn't work yet, there is no usage
+This doesn't work yet, there is no usage - BUT SOON IT SHALL WORK HAHAHA BECAUSE NOW YOU CAN SEND MESSAGES HOW GREAT IS THAT!
 
 Discussions
 -----------
