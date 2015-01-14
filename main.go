@@ -15,6 +15,29 @@ import (
 //var telToName map[string]string
 var debugLog = startDebugLogger()
 var inputBuffer []byte
+var currentContact string
+
+
+// getName returns the local contact name corresponding to a phone number,
+// or failing to find a contact the phone number itself
+func getName(tel string) string {
+    if n, ok := telToName[tel]; ok {
+        return n
+    }
+    return tel
+}
+
+// getTel returns the local contact telephone number corresponding to a name,
+// or failing to find a contact the name itself
+func getTel(name string) string {
+    if t,ok := nameToTel[name]; ok {
+        return t
+    }
+    return name
+}
+
+var telToName map[string]string
+var nameToTel map[string]string
 
 //sets up the initial configuration of curses. Keeps code in main cleaner.
 func configCurses(stdscr *gc.Window) {
@@ -110,7 +133,7 @@ func messageHandler(msg *ts.Message) {
 func clearScrSendMsg (inputWin *gc.Window) {
     if len(inputBuffer) != 0 {
         msg := string(inputBuffer)
-        to := string("+12345678910")
+        to := currentContact
         err := ts.SendMessage(to,msg)
         if err != nil {
             gc.End()
@@ -162,12 +185,13 @@ func makeMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *g
     contactsWin.Keypad(true)
     contactsMenuWin := contactsWin.Derived((contactsWinSizeY-5),(contactsWinSizeX-2),3,1)
     contactMenu.SetWindow(contactsMenuWin)
-    contactMenu.Format(5,1)
+    contactMenu.Format(len(contacts),1)
     contactMenu.Mark(" * ")
 
     title := "Contacts"
     contactsWin.MovePrint(1, (contactsWinSizeX/2)-(len(title)/2), title)
     contactsWin.HLine(2, 1, '-', contactsWinSizeX-2)
+    contactsMenuWin.Keypad(true)
     return menu_items, contactMenu, contactsMenuWin
 }
 
@@ -193,6 +217,16 @@ func main() {
         log.Fatal("Could not get contacts: %s\n", err)
     }
 
+    telToName = make(map[string]string)
+    for _, c := range contacts {
+        telToName[c.Tel] = c.Name
+    }
+    nameToTel = make(map[string]string)
+    for _, c := range contacts {
+        nameToTel[c.Name] = c.Tel
+    }
+    debugLog.Println(nameToTel)
+
     contactsWin, messageWin, inputBorderWin, inputWin := createMainWindows(stdscr)
     menu_items, contactMenu, contactsMenuWin := makeMenu(contacts, contactsWin)
 
@@ -203,6 +237,7 @@ func main() {
     inputBorderWin.Refresh()
 
     inputWin.Move(0,0)
+    currentContact = getTel(contactMenu.Current(nil).Name())
     inputHandler(inputWin, stdscr, contactsMenuWin, contactMenu)
     cleanup(menu_items, contactMenu)
 }

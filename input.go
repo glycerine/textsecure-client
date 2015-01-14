@@ -89,8 +89,9 @@ func contactsWindowNavigation(contactsMenuWin * gc.Window, contactMenu * gc.Menu
             return 0
         } else if  c == gc.Char(27) {
             return 1
+        } else if rawInput == gc.KEY_RETURN {
+            currentContact = getTel(contactMenu.Current(nil).Name())
         } else {
-            debugLog.Println("Doing driver actions...")
             contactMenu.Driver(gc.DriverActions[rawInput])
         }
     }
