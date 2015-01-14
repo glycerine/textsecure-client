@@ -90,12 +90,17 @@ func contactsWindowNavigation(contactsMenuWin * gc.Window, contactMenu * gc.Menu
         rawInput = contactsMenuWin.GetChar()
         c = gc.Char(rawInput)
         if rawInput == gc.KEY_TAB {
+            currentContact = getTel(contactMenu.Current(nil).Name())
             return 0
         } else if  c == gc.Char(27) {
             return 1
         } else if rawInput == gc.KEY_RETURN {
             currentContact = getTel(contactMenu.Current(nil).Name())
             return 0
+        } else if c == gc.Char('j') {
+            contactMenu.Driver(gc.REQ_DOWN)
+        } else if c == gc.Char('k') {
+            contactMenu.Driver(gc.REQ_UP)
         } else if c == gc.Char('g') {
             contactMenu.Driver(gc.REQ_FIRST)
         } else if c == gc.Char('G') {

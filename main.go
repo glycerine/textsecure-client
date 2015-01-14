@@ -120,13 +120,6 @@ func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *
     return contactsWin,messageWin,inputBorderWin,inputWin
 }
 
-func messageHandler(msg *ts.Message) {
-    err := ts.SendMessage(msg.Source(), msg.Message())
-    if err != nil {
-        log.Println(err)
-    }
-    return
-}
 
 
 // In addition to sending a message using janimo's library, also clears screen and resets buffer
