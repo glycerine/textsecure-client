@@ -9,4 +9,3 @@ maybe hunt down what was causing that segfault and offer a patch?
     Already filed a "bug" upstream
     write an automated test for this?
 Make an AddressBook frontEnd for .config/contacts.yml
-Make mapping "g" to go to top of contacts list "G" to go to bottom of contacts list 
