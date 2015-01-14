@@ -30,9 +30,13 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                 inputBuffer = inputBuffer[0:len(inputBuffer)-1]
                 //debugLog.Println(inputBuffer)
             } else {
-                inputWin.MoveDelChar(y-1,max_x)
-                inputBuffer = inputBuffer[0:len(inputBuffer)-1]
-                //debugLog.Println(inputBuffer)
+                if y!=0 {
+                    inputWin.MoveDelChar(y-1,max_x)
+                    inputBuffer = inputBuffer[0:len(inputBuffer)-1]
+                    //debugLog.Println(inputBuffer)
+                } else {
+                    continue
+                }
             }
         } else if c == gc.KEY_LEFT {
             y,x := inputWin.CursorYX()
@@ -91,6 +95,11 @@ func contactsWindowNavigation(contactsMenuWin * gc.Window, contactMenu * gc.Menu
             return 1
         } else if rawInput == gc.KEY_RETURN {
             currentContact = getTel(contactMenu.Current(nil).Name())
+            return 0
+        } else if c == gc.Char('g') {
+            contactMenu.Driver(gc.REQ_FIRST)
+        } else if c == gc.Char('G') {
+            contactMenu.Driver(gc.REQ_LAST)
         } else {
             contactMenu.Driver(gc.DriverActions[rawInput])
         }
