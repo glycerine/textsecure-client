@@ -10,6 +10,7 @@ import(
 
 // handles keyboard input
 func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.Window, contactMenu *gc.Menu) {
+    var placer = 0
     var c gc.Char
     var rawInput gc.Key
     max_y, max_x := inputWin.MaxYX()
@@ -25,6 +26,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
         } else if rawInput == gc.KEY_BACKSPACE || c == gc.Char(127) {
             //Delete Key
             y,x := inputWin.CursorYX()
+            placer--;
             if x != 0 {
                 inputWin.MoveDelChar(y,x-1)
                 inputBuffer = inputBuffer[0:len(inputBuffer)-1]
@@ -41,11 +43,14 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             }
         } else if c == gc.KEY_LEFT {
             y,x := inputWin.CursorYX()
+            placer--;
             if x != 0 {
                 inputWin.Move(y,x-1)
+                placer++
             }
         } else if c == gc.KEY_RIGHT {
             y,x := inputWin.CursorYX()
+            placer++
             if x != max_x {
                 inputWin.Move(y,x+1)
             }
@@ -53,11 +58,13 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             y,x := inputWin.CursorYX()
             if y != 0 {
                 inputWin.Move(y-1,x)
+                placer -= max_x
             }
         } else if c == gc.KEY_DOWN {
             y,x := inputWin.CursorYX()
             if y != max_y {
                 inputWin.Move(y+1,x)
+                placer += max_x
             }
         } else if rawInput == gc.KEY_TAB {
             y,x := inputWin.CursorYX()
@@ -69,14 +76,27 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             gc.Cursor(1)
             inputWin.Move(y,x)
         } else if rawInput == gc.KEY_RETURN {
+            placer = 0;
             clearScrSendMsg(inputWin)
         } else if rawInput == gc.KEY_SRIGHT {
             inputWin.Print("\n")
             inputBuffer = append(inputBuffer,byte(10))
         } else if rawInput == gc.KEY_SLEFT {
         } else {
-            inputWin.Print(string(c))
-            inputBuffer = append(inputBuffer,byte(c))
+            y,x := inputWin.CursorYX()
+            inputWin.Erase();
+            // inputWin.Print(string(c))
+            if inputBuffer == nil {
+                inputBuffer = append(inputBuffer,byte(c))
+            } else {
+                inputBuffer = inputBuffer[0:len(inputBuffer) + 1]
+                copy(inputBuffer[placer + 1:], inputBuffer[placer:])
+                inputBuffer[placer] = byte(c)
+            }
+            placer++
+            inputWin.Print(string(inputBuffer))
+            inputWin.Move(y,x + 1)
+
             //debugLog.Println(inputBuffer)
         }
     }
