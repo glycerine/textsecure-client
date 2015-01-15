@@ -78,7 +78,6 @@ func configCurses(stdscr *gc.Window) {
     gc.Cursor(1)
     gc.CBreak(true)
     stdscr.Clear()
-    stdscr.ColorOn(1)
 }
 
 //creates the three Main big windows that make up the GUI
@@ -135,6 +134,7 @@ func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *
     }
 
     inputWin.Keypad(true)
+    msgWin.ScrollOk(true)
 
     return contactsWin,messageWinBorder,msgWin,inputBorderWin,inputWin
 }
@@ -205,6 +205,7 @@ func makeContactsMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.Menu
     contactsWin.MovePrint(1, (contactsWinSizeX/2)-(len(title)/2), title)
     contactsWin.HLine(2, 1, '-', contactsWinSizeX-2)
     contactsMenuWin.Keypad(true)
+    contactsMenuWin.ScrollOk(true)
     return menu_items, contactMenu, contactsMenuWin
 }
 

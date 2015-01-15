@@ -14,18 +14,22 @@ import(
 // Prints messages to the message window 
 func printToMsgWindow(msg string, msgWin *gc.Window, amSending bool) {
     lines := int(len(msg) / (msgWinSize_x-1)) + 1
-    y,x := globalInputWin.CursorYX()
-    debugLog.Println("HIT")
     if amSending == true {
+        msgWin.Scroll(lines)
+        msgWin.ColorOn(2)
         msgWin.MovePrint((msgWinSize_y-lines),0,msg)
     } else{
         if lines > 1 {
+            msgWin.Scroll(lines)
+            msgWin.ColorOn(1)
             msgWin.MovePrint((msgWinSize_y-lines),int(msgWinSize_x * 3 / 4),msg)
-            globalInputWin.Move(y,x)
+            msgWin.Scroll(-1)
         } else {
+            msgWin.Scroll(lines)
+            msgWin.ColorOn(1)
             space_buf := (msgWinSize_x) - len(msg)
             msgWin.MovePrint((msgWinSize_y-lines),space_buf,msg)
-            globalInputWin.Move(y,x)
+            msgWin.Scroll(-1)
         }
     }
     msgWin.Refresh()
