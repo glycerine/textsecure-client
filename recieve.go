@@ -9,14 +9,12 @@ import(
     ts "github.com/janimo/textsecure"
 )
 
-func messageHandler(msg *ts.Message) {
-    err := ts.SendMessage(msg.Source(), msg.Message())
-    if err != nil {
-        log.Println(err)
-    }
+func recieveMessage(msg *ts.Message) {
 
     if msg.Message() != "" {
         //fmt.Printf("\r                                               %s%s : %s%s%s\n>", red, getName(msg.Source()), green, msg.Message(), blue)
+        printToMsgWindow(msg.Message(),globalMsgWin,false)
+        //debugLog.Println(msg.Message())
     }
 
     for _, a := range msg.Attachments() {
@@ -33,9 +31,4 @@ func handleAttachment(src string, b []byte) {
     }
     log.Printf("Saving attachment of length %d from %s to %s", len(b), src, f.Name())
     f.Write(b)
-
 }
-//
-//// prints to the message window screen.
-//func msgWinPrint(a ... interface{}) {
-//}

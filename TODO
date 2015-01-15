@@ -1,3 +1,9 @@
+HIGH PRIORITY:
+
+With shittons of contacts, the thing doesn't scroll, even though it was supposed to.
+
+Still getting segfaults with Delete key
+
 MEDIUM PRIORITY:
 
 how to solve whitespace in the textbox vs the buffer with the arrow keys?
@@ -15,9 +21,7 @@ maybe hunt down what was causing that segfault and offer a patch?
 
 Make an AddressBook frontEnd for .config/contacts.yml
 
-Fix Backspace not showing up correctly (On some devices...)
-
-
+Find out why there's occasional runtime errors in the ts library
 
 
 

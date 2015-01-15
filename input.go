@@ -9,7 +9,7 @@ import(
 )
 
 // handles keyboard input
-func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.Window, contactMenu *gc.Menu) {
+func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.Window, contactMenu *gc.Menu, msgWin *gc.Window) {
     var c gc.Char
     var rawInput gc.Key
     max_y, max_x := inputWin.MaxYX()
@@ -69,7 +69,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             gc.Cursor(1)
             inputWin.Move(y,x)
         } else if rawInput == gc.KEY_RETURN {
-            clearScrSendMsg(inputWin)
+            sendMsg(inputWin,msgWin)
         } else if rawInput == gc.KEY_SRIGHT {
             inputWin.Print("\n")
             inputBuffer = append(inputBuffer,byte(10))

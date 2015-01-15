@@ -12,11 +12,23 @@ import (
 //    "reflect"
 )
 
-//var telToName map[string]string
-var debugLog = startDebugLogger()
-var inputBuffer []byte
-var currentContact string
 
+//Global variables that make things way more convenient, rather than passing copies all the time
+var(
+//    contactsWin *gc.Window
+//    messageWinBorder *gc.Window
+      globalMsgWin *gc.Window
+//    inputBorderWin *gc.Window
+      globalInputWin *gc.Window
+//    menu_items []*gc.MenuItem
+//    contactMenu *gc.Menu
+//    contactsMenuWin *gc.Window
+    debugLog = startDebugLogger()
+    inputBuffer []byte
+    currentContact string
+    msgWinSize_x int
+    msgWinSize_y int
+)
 
 // getName returns the local contact name corresponding to a phone number,
 // or failing to find a contact the phone number itself
@@ -70,11 +82,11 @@ func configCurses(stdscr *gc.Window) {
 }
 
 //creates the three Main big windows that make up the GUI
-func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *gc.Window) {
+func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *gc.Window, *gc.Window) {
     rows, cols := stdscr.MaxYX()
     height, width := rows,int(float64(cols) * .2)
 
-    var contactsWin,messageWin,inputBorderWin, inputWin *gc.Window
+    var contactsWin,messageWinBorder,inputBorderWin, inputWin *gc.Window
     var err error
     contactsWin, err = gc.NewWindow(height, width, 0, 0)
     if err != nil {
@@ -85,16 +97,23 @@ func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *
         log.Fatal("Failed to create Border of Contact Window:",err)
     }
 
+    // messageWinBorder is just the border. msgWin is the actual input window
+    // doing this simplifies handling text a fair amount.
+    // also the derived function never errors. Which seems dangerous 
     begin_x := width+1
     height = int(float64(rows) * .8)
     width =  int(float64(cols) * .8)
-    messageWin, err = gc.NewWindow(height, width, 0, begin_x)
+    messageWinBorder, err = gc.NewWindow(height, width, 0, begin_x)
     if err != nil {
-        log.Fatal("Failed to create Message Window:",err)
+        log.Fatal("Failed to create Message Border Window:",err)
     }
-    err = messageWin.Border('|','|','-','-','+','+','+','+')
+    err = messageWinBorder.Border('|','|','-','-','+','+','+','+')
     if err != nil {
         log.Fatal("Failed to create Border of Message Window:",err)
+    }
+    msgWin, err := gc.NewWindow((height -2),(width-2),1,(begin_x+1))
+    if err != nil {
+        log.Fatal("Failed to create the message Window:",err)
     }
 
     begin_y := int(float64(rows) * .8 ) + 1
@@ -117,17 +136,17 @@ func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *
 
     inputWin.Keypad(true)
 
-    return contactsWin,messageWin,inputBorderWin,inputWin
+    return contactsWin,messageWinBorder,msgWin,inputBorderWin,inputWin
 }
 
 
-
 // In addition to sending a message using janimo's library, also clears screen and resets buffer
-func clearScrSendMsg (inputWin *gc.Window) {
+func sendMsg (inputWin *gc.Window, msgWin *gc.Window) {
     if len(inputBuffer) != 0 {
         msg := string(inputBuffer)
         to := currentContact
         err := ts.SendMessage(to,msg)
+        printToMsgWindow(msg,msgWin, true)
         if err != nil {
             gc.End()
             log.Fatal("SendMessage failed yo: ",err)
@@ -136,6 +155,7 @@ func clearScrSendMsg (inputWin *gc.Window) {
         inputWin.Erase()
     }
 }
+
 
 // Hello dialog. So the nooblets know the controls
 func doHello( stdscr *gc.Window) {
@@ -161,7 +181,7 @@ func cleanup (menu_items []*gc.MenuItem, contactMenu *gc.Menu) {
 }
 
 // makes the menu inside the contacts window
-func makeMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *gc.Menu, *gc.Window)  {
+func makeContactsMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *gc.Menu, *gc.Window) {
     menu_items := make([]*gc.MenuItem, len(contacts))
     var err error
     for i, val := range contacts {
@@ -172,7 +192,7 @@ func makeMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *g
     }
     contactMenu, err := gc.NewMenu(menu_items)
     if err != nil {
-        log.Fatal("Error making contact menu... ", err)
+        log.Fatal("Error creating contact menu from menu_items... ", err)
     }
     contactsWinSizeY, contactsWinSizeX := contactsWin.MaxYX()
     contactsWin.Keypad(true)
@@ -188,13 +208,12 @@ func makeMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.MenuItem, *g
     return menu_items, contactMenu, contactsMenuWin
 }
 
-
 // creates a curses based TUI for the textsecure library
 func main() {
     client := &ts.Client{
         RootDir:        ".",
         ReadLine:       ts.ConsoleReadLine,
-        MessageHandler: messageHandler,
+        MessageHandler: recieveMessage,
     }
     ts.Setup(client)
     stdscr, err := gc.Init()
@@ -218,19 +237,25 @@ func main() {
     for _, c := range contacts {
         nameToTel[c.Name] = c.Tel
     }
-    debugLog.Println(nameToTel)
 
-    contactsWin, messageWin, inputBorderWin, inputWin := createMainWindows(stdscr)
-    menu_items, contactMenu, contactsMenuWin := makeMenu(contacts, contactsWin)
+    contactsWin, messageWinBorder, msgWin, inputBorderWin, inputWin := createMainWindows(stdscr)
+    menu_items, contactMenu, contactsMenuWin := makeContactsMenu(contacts, contactsWin)
+    globalInputWin = inputWin
+    globalMsgWin = msgWin
 
     contactsMenuWin.Touch()
     contactMenu.Post()
     contactsWin.Refresh()
-    messageWin.Refresh()
+    messageWinBorder.Refresh()
     inputBorderWin.Refresh()
+    msgWin.Refresh()
+    msgWinSize_y,msgWinSize_x = msgWin.MaxYX()
+    //msgWin.MovePrint(0,0,"test")
+    //msgWin.Refresh()
 
     inputWin.Move(0,0)
     currentContact = getTel(contactMenu.Current(nil).Name())
-    inputHandler(inputWin, stdscr, contactsMenuWin, contactMenu)
+    go ts.ListenForMessages()
+    inputHandler(inputWin, stdscr, contactsMenuWin, contactMenu, msgWin)
     cleanup(menu_items, contactMenu)
 }
