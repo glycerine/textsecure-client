@@ -94,21 +94,18 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
         } else if rawInput == gc.KEY_SLEFT {
         } else {
             y,x := inputWin.CursorYX()
-            inputWin.Erase();
             // inputWin.Print(string(c))
             if inputBuffer == nil || placer == len(inputBuffer) - 1 {
                 inputBuffer = append(inputBuffer,byte(c))
-            } else if placer == -1 {
-                inputBuffer = append(inputBuffer,byte(c))
-                copy(inputBuffer[1:], inputBuffer[:])
-                inputBuffer[placer + 1] = byte(c)
+                inputWin.Print(string(c))
             } else {
+                inputWin.Erase()
                 inputBuffer = append(inputBuffer,byte(c))
                 copy(inputBuffer[placer + 1:], inputBuffer[placer:])
                 inputBuffer[placer + 1] = byte(c)
+                inputWin.Print(string(inputBuffer))
             }
             placer++
-            inputWin.Print(string(inputBuffer))
             inputWin.Move(y,x + 1)
 
             //debugLog.Println(inputBuffer)
