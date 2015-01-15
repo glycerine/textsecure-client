@@ -100,6 +100,10 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             // inputWin.Print(string(c))
             if inputBuffer == nil || placer == len(inputBuffer) - 1 {
                 inputBuffer = append(inputBuffer,byte(c))
+            } else if placer == -1 {
+                inputBuffer = append(inputBuffer,byte(c))
+                copy(inputBuffer[1:], inputBuffer[:])
+                inputBuffer[placer + 1] = byte(c)
             } else {
                 inputBuffer = append(inputBuffer,byte(c))
                 copy(inputBuffer[placer + 1:], inputBuffer[placer:])
