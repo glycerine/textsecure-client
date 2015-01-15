@@ -9,6 +9,7 @@ import(
 //    "log"
     //janimo's textsecure library. Documentation here: https://godoc.org/github.com/janimo/textsecure
 //  ts "github.com/janimo/textsecure"
+    "strings"
 )
 
 // Prints messages to the message window 
@@ -19,17 +20,37 @@ func printToMsgWindow(msg string, msgWin *gc.Window, amSending bool) {
         msgWin.ColorOn(2)
         msgWin.MovePrint((msgWinSize_y-lines),0,msg)
     } else{
-        if lines > 1 {
-            msgWin.Scroll(lines)
-            msgWin.ColorOn(1)
-            msgWin.MovePrint((msgWinSize_y-lines),int(msgWinSize_x * 3 / 4),msg)
-            msgWin.Scroll(-1)
+        if strings.ContainsAny(msg,"\n") {
+            printByLineBreakdown := strings.Split(msg,"\n")
+            for i,val := range printByLineBreakdown {
+                if i!= 0 {
+                    msgWin.Scroll(1)
+                }
+                lines2 := int(len(val) / (msgWinSize_x-1)) + 1
+                if lines2 > 1 {
+                    msgWin.Scroll(lines2)
+                    msgWin.ColorOn(1)
+                    msgWin.MovePrint((msgWinSize_y-lines2),int(msgWinSize_x * 3 / 4),val)
+                } else {
+                    msgWin.Scroll(lines2)
+                    msgWin.ColorOn(1)
+                    space_buf := (msgWinSize_x) - len(val)
+                    msgWin.MovePrint((msgWinSize_y-lines),space_buf,val)
+                    msgWin.Scroll(-1)
+                }
+            }
         } else {
-            msgWin.Scroll(lines)
-            msgWin.ColorOn(1)
-            space_buf := (msgWinSize_x) - len(msg)
-            msgWin.MovePrint((msgWinSize_y-lines),space_buf,msg)
-            msgWin.Scroll(-1)
+            if lines > 1 {
+                msgWin.Scroll(lines)
+                msgWin.ColorOn(1)
+                msgWin.MovePrint((msgWinSize_y-lines),int(msgWinSize_x * 3 / 4),msg)
+            } else {
+                msgWin.Scroll(lines)
+                msgWin.ColorOn(1)
+                space_buf := (msgWinSize_x) - len(msg)
+                msgWin.MovePrint((msgWinSize_y-lines),space_buf,msg)
+                msgWin.Scroll(-1)
+            }
         }
     }
     msgWin.Refresh()

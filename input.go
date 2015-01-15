@@ -39,6 +39,16 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                     continue
                 }
             }
+        } else if c == gc.KEY_PAGEDOWN {
+            //debugLog.Println("HIT DOWN")
+            msgWin.Scroll(-10)
+            msgWin.Refresh()
+            inputWin.Refresh()
+        } else if c == gc.KEY_PAGEUP {
+            //debugLog.Println("HIT UP")
+            msgWin.Scroll(10)
+            msgWin.Refresh()
+            inputWin.Refresh()
         } else if c == gc.KEY_LEFT {
             y,x := inputWin.CursorYX()
             if x != 0 {
@@ -73,6 +83,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
         } else if rawInput == gc.KEY_SRIGHT {
             inputWin.Print("\n")
             inputBuffer = append(inputBuffer,byte(10))
+            //debugLog.Println(inputBuffer)
         } else if rawInput == gc.KEY_SLEFT {
         } else {
             inputWin.Print(string(c))
@@ -90,14 +101,11 @@ func contactsWindowNavigation(contactsMenuWin * gc.Window, contactMenu * gc.Menu
         gc.Update()
         rawInput = contactsMenuWin.GetChar()
         c = gc.Char(rawInput)
-        if rawInput == gc.KEY_TAB {
+        if rawInput == gc.KEY_TAB || rawInput == gc.KEY_RETURN {
             currentContact = getTel(contactMenu.Current(nil).Name())
             return 0
         } else if  c == gc.Char(27) {
             return 1
-        } else if rawInput == gc.KEY_RETURN {
-            currentContact = getTel(contactMenu.Current(nil).Name())
-            return 0
         } else if c == gc.Char('j') {
             contactMenu.Driver(gc.REQ_DOWN)
         } else if c == gc.Char('k') {
