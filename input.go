@@ -26,14 +26,11 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
         } else if rawInput == gc.KEY_BACKSPACE || c == gc.Char(127) {
             //Delete Key
             y,x := inputWin.CursorYX()
-            placer--;
-            if (placer < - 1) {
-                placer = -1
-            }
             if x != 0 {
                 inputWin.MoveDelChar(y,x-1)
-                copy(inputBuffer[placer + 1: len(inputBuffer) - 1], inputBuffer[placer + 2:])
+                copy(inputBuffer[placer: len(inputBuffer) - 1], inputBuffer[placer + 1:])
                 inputBuffer = inputBuffer[0:len(inputBuffer)-1]
+                placer--;
                 //debugLog.Println(inputBuffer)
             } else if y!=0 {
                     inputWin.Move(y - 1, max_x - 1)
@@ -41,6 +38,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                     copy(inputBuffer[placer : len(inputBuffer) - 1], inputBuffer[placer + 1:])
                     inputBuffer = inputBuffer[0:len(inputBuffer)-1]
                     //debugLog.Println(inputBuffer)
+                    placer--;
                 }             
         } else if c == gc.KEY_LEFT {
             y,x := inputWin.CursorYX()
