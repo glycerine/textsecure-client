@@ -8,9 +8,16 @@ import(
     gc "code.google.com/p/goncurses"
 )
 
+type newLine struct {
+    _cursorX int
+    _placer int
+}
+
 // handles keyboard input
 func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.Window, contactMenu *gc.Menu) {
     var placer = -1
+    var NLlocate = map[int]newLine {
+    }
     var c gc.Char
     var rawInput gc.Key
     max_y, max_x := inputWin.MaxYX()
@@ -54,22 +61,36 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             if inputBuffer == nil || placer == len(inputBuffer) {
                 inputBuffer = append(inputBuffer,byte(' '))
             }
-            if x != max_x {
+            if inputBuffer[placer] == byte('s') {
+                inputWin.Move(y + 1, 0)
+            } else if x != max_x {
                 inputWin.Move(y,x+1)
             } else {
                 inputWin.Move(y + 1, x)
             }
         } else if c == gc.KEY_UP {
             y,x := inputWin.CursorYX()
-            if y != 0 {
+            if y != 0{
                 inputWin.Move(y-1,x)
                 placer -= max_x
+            }
+            if NLlocate[y - 1]._placer != 0 {
+                if NLlocate[y-1]._cursorX > x {
+                    placer = NLlocate[y-1]._placer
+                    inputWin.Move(y - 1, NLlocate[y - 1]._cursorX)
+                } else {
+                    placer = NLlocate[y-1]._placer - (NLlocate[y-1]._cursorX - x)
+                }
             }
         } else if c == gc.KEY_DOWN {
             y,x := inputWin.CursorYX()
             if y != max_y {
                 inputWin.Move(y+1,x)
-                placer += max_x
+                if NLlocate[y]._placer == 0 {
+                    placer += max_x
+                } else {
+                    placer = NLlocate[y]._placer + x
+                }
             }
             if placer >= len(inputBuffer) {
                 for i:= len(inputBuffer); i < placer + 1; i++ {
@@ -87,17 +108,23 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             inputWin.Move(y,x)
         } else if rawInput == gc.KEY_RETURN {
             placer = 0;
+            for i := range NLlocate {
+                delete (NLlocate, i);
+            }
             clearScrSendMsg(inputWin)
         } else if rawInput == gc.KEY_SRIGHT {
+            y,x := inputWin.CursorYX()
             inputWin.Print("\n")
-            inputBuffer = append(inputBuffer,byte(10))
+            temp := newLine{x, placer}
+            NLlocate[y] = temp
+            placer++
+            inputBuffer = append(inputBuffer,byte('\n'))
         } else if rawInput == gc.KEY_SLEFT {
         } else {
             y,x := inputWin.CursorYX()
-            // inputWin.Print(string(c))
             if inputBuffer == nil || placer == len(inputBuffer) - 1 {
-                inputBuffer = append(inputBuffer,byte(c))
                 inputWin.Print(string(c))
+                inputBuffer = append(inputBuffer,byte(c))
             } else {
                 inputWin.Erase()
                 inputBuffer = append(inputBuffer,byte(c))
