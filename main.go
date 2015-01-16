@@ -28,6 +28,7 @@ var(
     currentContact string
     msgWinSize_x int
     msgWinSize_y int
+    pass string
 )
 
 // getName returns the local contact name corresponding to a phone number,
@@ -90,12 +91,27 @@ func main() {
     }
     defer gc.End()
     configCurses(stdscr)
-    doHello(stdscr)
 
-    debugLog.Println(getPass())
-    //passphraseUnlock(client)
-    stdscr.Clear()
-    stdscr.Refresh()
+    for i:=0;i<3;i++ {
+        doHello(stdscr)
+        var locked bool = passphraseUnlock(client)
+        if locked == false {
+            stdscr.ColorOn(1)
+            stdscr.MovePrint(0,0,"Password incorrect, hit any key...")
+            stdscr.ColorOff(1)
+            stdscr.GetChar()
+            stdscr.Clear()
+            stdscr.Refresh()
+        } else {
+            stdscr.Clear()
+            stdscr.Refresh()
+            break
+        }
+        if i == 2 {
+            log.Fatal("Password wrong too many times. Exiting...")
+        }
+    }
+
 
     contacts, err := ts.GetRegisteredContacts()
     if err != nil {

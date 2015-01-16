@@ -141,10 +141,9 @@ func getPass() string {
             }
         } else if rawInput == gc.KEY_RETURN {
             if x !=0 {
-                gc.Echo(true)
                 return string(returnString)
             }
-        } else if c > 32 && c < 127 {
+        } else if c > 31 && c < 127 {
             returnString = append(returnString,byte(c))
             x++
         } else {

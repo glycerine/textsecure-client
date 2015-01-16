@@ -140,7 +140,4 @@ func doHello( stdscr *gc.Window) {
     stdscr.MovePrintln(center_y - 3,center_x-11,"Return: Send a message")
     stdscr.MovePrintln(center_y - 2,center_x-44,`Shift + Right Arrow: put in a new line '\n' character (like shift+return in facebook chat)`)
     stdscr.MovePrintln(center_y - 1,center_x-30,"Page-Up / Page-Down: Scroll up in the message history window")
-    stdscr.Println()
-    stdscr.MovePrintln(center_y,center_x-16,"Please enter your password below:")
-    stdscr.Move(center_y+1,center_x-16)
 }
