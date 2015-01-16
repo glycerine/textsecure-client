@@ -1,6 +1,6 @@
 # TextSecure Command Line Client
 
-Many thanks to the people behind golang, ncurses, Rob Thornton for his [goncurses] (https://code.google.com/p/goncurses/) library, and @janimo for his [golang textsecure] (https://github.com/janimo/textsecure.git) library, and @agnivade for his [scrypt library] (https://github.com/agnivade/easy-scrypt.git).
+Many thanks to the people behind golang and all its libraries, ncurses, Rob Thornton for his [goncurses] (https://code.google.com/p/goncurses/) library, @janimo for his [golang textsecure] (https://github.com/janimo/textsecure.git) library, and @mattn for his [go-sqlite3] (https://github.com/mattn/go-sqlite3) driver.
 
 ** At the moment nothing is supported, this is still in development and DOES.NOT.WORK **
 
@@ -25,3 +25,8 @@ Discussions
 -----------
 
 User and developer discussions happen on the [mailing list] (https://groups.google.com/forum/#!forum/textsecure-go)
+
+License
+-------
+
+This code in this repository is under the GNU GPL v3.0. The Go programming language, the bcrypt library, and the goncurses library are all under a 3-clause BSD License, @janimo's textsecure library is under the GPL v3.0, and mattn's go-sqlite3 driver is under an MIT License. That means that all the code required for this software to run is Free, Libre and Open Source Software (FLOSS).
