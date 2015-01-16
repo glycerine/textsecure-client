@@ -1,6 +1,6 @@
 # TextSecure Command Line Client
 
-Many thanks to the people behind golang, ncurses, Rob Thornton for his [goncurses] (https://code.google.com/p/goncurses/) library, and @janimo for his [golang textsecure] (https://github.com/janimo/textsecure.git) library.
+Many thanks to the people behind golang, ncurses, Rob Thornton for his [goncurses] (https://code.google.com/p/goncurses/) library, and @janimo for his [golang textsecure] (https://github.com/janimo/textsecure.git) library, and @agnivade for his [scrypt library] (https://github.com/agnivade/easy-scrypt.git).
 
 ** At the moment nothing is supported, this is still in development and DOES.NOT.WORK **
 

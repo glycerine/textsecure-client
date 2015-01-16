@@ -1,10 +1,26 @@
+
+
+
+
+figure out how to use sqlite
+encrypt incomin messages and put them in the database for the associated person
+encrypt outgoing messages and put them in the database for the associated person
+
+
+
+
+
 HIGH PRIORITY:
 
     With shittons of contacts, the thing doesn't scroll, even though it was supposed to.
 
     Still getting segfaults with Delete key
 
+    concurrrency locks on drawing to the screen
+
 MEDIUM PRIORITY:
+
+    UTF-8 passwords
 
     how to solve whitespace in the textbox vs the buffer with the arrow keys?
         Idea: keep a placeholder value in the buffer that you increment/decrement for left/right
@@ -13,14 +29,9 @@ MEDIUM PRIORITY:
     delete doesn't wrap around right
         debug this shit
 
-    maybe hunt down what was causing that segfault and offer a patch?
-        disable the initialization, the session was null because we didn't initalize.
-        store.go line 315 segfaults because session is null 
-        Already filed a "bug" upstream
-        write an automated test for this?
-
-
+    
     Find out why there's occasional runtime errors in the ts library
+        Partially figured out, need to write a bug report and file upstream
 
 
 LOW PRIORITY:
@@ -32,3 +43,13 @@ LOW PRIORITY:
     add attachment dialog
 
     Make an AddressBook frontEnd for .config/contacts.yml for the nooblets
+
+    maybe hunt down what was causing that segfault and offer a patch?
+        disable the initialization, the session was null because we didn't initalize.
+        store.go line 315 segfaults because session is null 
+        Already filed a "bug" upstream
+        write an automated test for this?
+    
+    Ask janimo to consider exposing session.go:359 - if he log.Printfs it's gonna screw up the pretty TUI
+            log.Printf("Identity of remote %s is not trusted, it may have reinstalled\n. For now delete the file .storage/identity/remote_%s to approve.\n", id, id)
+
