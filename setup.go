@@ -127,18 +127,20 @@ func makeContactsMenu(contacts []ts.Contact, contactsWin *gc.Window) ([]*gc.Menu
     contactsMenuWin.ScrollOk(true)
     return menu_items, contactMenu, contactsMenuWin
 }
+
 // Hello dialog. So the nooblets know the controls
 func doHello( stdscr *gc.Window) {
     stdscr.Refresh()
-    stdscr.MovePrintln(5,5, "Controls:")
-    stdscr.Println("Escape: Exits the program.")
-    stdscr.Println("Tab: Switches between the input window and the Message window.")
-    stdscr.Println("Return: Sends a message")
-    stdscr.Println(`Shift + Right Arrow: puts in a new line '\n' character (like shift+return in facebook chat)`)
-    stdscr.Println("Press any key to continue...")
-    stdscr.GetChar()
-    stdscr.Clear()
-    stdscr.Refresh()
+    y,x := stdscr.MaxYX()
+    center_x := int(x/2)
+    center_y := int(y/2)
+    stdscr.MovePrintln(center_y - 6,center_x-4, "Controls:")
+    stdscr.MovePrintln(center_y - 5,center_x-12,"Escape: Exit the program.")
+    stdscr.MovePrintln(center_y - 4,center_x-30,"Tab: Switch between the input window and the Message window.")
+    stdscr.MovePrintln(center_y - 3,center_x-11,"Return: Send a message")
+    stdscr.MovePrintln(center_y - 2,center_x-44,`Shift + Right Arrow: put in a new line '\n' character (like shift+return in facebook chat)`)
+    stdscr.MovePrintln(center_y - 1,center_x-30,"Page-Up / Page-Down: Scroll up in the message history window")
+    stdscr.Println()
+    stdscr.MovePrintln(center_y,center_x-16,"Please enter your password below:")
+    stdscr.Move(center_y+1,center_x-16)
 }
-
-

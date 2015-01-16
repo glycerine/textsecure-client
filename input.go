@@ -119,3 +119,37 @@ func contactsWindowNavigation(contactsMenuWin * gc.Window, contactMenu * gc.Menu
         }
     }
 }
+
+// Gets password from input
+func getPass() string {
+    gc.Echo(false)
+    stdscr := gc.StdScr()
+    var returnString []byte
+
+    x := 0
+    var c gc.Char
+    var rawInput gc.Key
+    for {
+        rawInput = stdscr.GetChar()
+        c = gc.Char(rawInput)
+        if rawInput == gc.KEY_BACKSPACE || c == gc.Char(127) {
+            if x != 0 {
+                returnString = returnString[0:len(returnString)-1]
+                x--
+            } else {
+                continue
+            }
+        } else if rawInput == gc.KEY_RETURN {
+            if x !=0 {
+                gc.Echo(true)
+                return string(returnString)
+            }
+        } else if c > 32 && c < 127 {
+            returnString = append(returnString,byte(c))
+            x++
+        } else {
+            continue
+        }
+    }
+}
+

@@ -92,6 +92,11 @@ func main() {
     configCurses(stdscr)
     doHello(stdscr)
 
+    debugLog.Println(getPass())
+    //passphraseUnlock(client)
+    stdscr.Clear()
+    stdscr.Refresh()
+
     contacts, err := ts.GetRegisteredContacts()
     if err != nil {
         log.Fatal("Could not get contacts: %s\n", err)
