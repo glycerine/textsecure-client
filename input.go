@@ -48,6 +48,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             } else if y!=0 {
                     inputWin.Move(y - 1, max_x - 1)
                     inputWin.MoveDelChar(y - 1,max_x - 1)
+                    del = inputBuffer[placer]
                     copy(inputBuffer[placer : len(inputBuffer) - 1], inputBuffer[placer + 1:])
                     inputBuffer = inputBuffer[0:len(inputBuffer)-1]
                     //debugLog.Println(inputBuffer)
