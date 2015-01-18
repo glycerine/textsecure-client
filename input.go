@@ -55,8 +55,35 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                     placer--;
                 }             
             if del == byte('\n') {
+                inputWin.Erase()
+                inputWin.Print(string(inputBuffer))
                 inputWin.Move(y - 1, NLlocate[y - 1]._cursorX)
-                delete (NLlocate, y - 1);
+                temp, check := NLlocate[y];
+                var temp_cursor = temp._cursorX
+                var temp_placer = temp._placer
+                if check && NLlocate[y - 1]._cursorX + temp_cursor >= max_x {
+                    _newLine := newLine{NLlocate[y - 1]._cursorX + temp_cursor - max_x - 1, NLlocate[y]._placer - 1}
+                    NLlocate[y] = _newLine
+                    delete (NLlocate, y - 1)
+                } else if  check {                                  // check if there are any '\n' this line
+                    var largest = -1                                // if yes, select all '\n' and move
+                    for i := range NLlocate {                       // placer by 1 and adjust cursor
+                        if i >= y {                                 // accordingly
+                            if next_nl,ok := NLlocate[i + 1]; ok {  
+                                new_nl := newLine{next_nl._cursorX, next_nl._placer - 1}
+                                NLlocate[i] = new_nl
+                            }
+                        }
+                        if i > largest {
+                            largest = i
+                        }
+                    }
+                    delete (NLlocate, largest)                      // delete last map entry
+                    _newLine := newLine{NLlocate[y - 1]._cursorX + temp_cursor , NLlocate[y - 1]._placer + temp_placer - 1}
+                    NLlocate[y - 1] = _newLine
+                } else {
+                    delete (NLlocate, y - 1)
+                }
             }
         } else if c == gc.KEY_LEFT {
             y,x := inputWin.CursorYX()
@@ -78,10 +105,10 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             }
             if inputBuffer[placer] == byte('\n') {
                 inputWin.Move(y + 1, 0)
-            } else if x != max_x {
+            } else if x != max_x - 1 {
                 inputWin.Move(y,x+1)
             } else {
-                inputWin.Move(y + 1, x)
+                inputWin.Move(y + 1, 0)
             }
         } else if c == gc.KEY_UP {
             y,x := inputWin.CursorYX()
@@ -147,7 +174,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                 inputBuffer[placer + 1] = byte(c)
                 inputWin.Print(string(inputBuffer))
             }
-            if NLlocate[y]._cursorX > x {
+            if NLlocate[y]._cursorX >= x {
                 temp := newLine{NLlocate[y]._cursorX + 1, NLlocate[y]._placer + 1}
                 NLlocate[y] = temp
             }
