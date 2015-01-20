@@ -9,8 +9,7 @@ Screenshot
 
 ![screenshot of textsecure for terminal](https://github.com/f4lk0r/textsecure-client/wiki/screenshots/output.gif)
 
-
-
+Hint: click on the gif for full screen better quality image
 
 Installation
 ------------
