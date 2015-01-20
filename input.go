@@ -102,7 +102,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             placer++
             if inputBuffer == nil || placer == len(inputBuffer) {
                 inputBuffer = append(inputBuffer,byte(' '))
-            }
+            } 
             if inputBuffer[placer] == byte('\n') || x >= max_x - 1 {
                 inputWin.Move(y + 1, 0)
             } else {
@@ -118,7 +118,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                 if NLlocate[y-1]._cursorX < x {
                     placer = NLlocate[y-1]._placer
                     inputWin.Move(y - 1, NLlocate[y - 1]._cursorX)
-                } else {
+                } else if y != 0 && x != 0{
                     placer = NLlocate[y-1]._placer - (NLlocate[y-1]._cursorX - x)
                 }
             }
