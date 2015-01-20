@@ -5,8 +5,8 @@ package main
 
 import (
     //janimo's textsecure library. Documentation here: https://godoc.org/github.com/janimo/textsecure
-	ts "github.com/janimo/textsecure"
-    //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
+    ts "github.com/janimo/textsecure"
+//    //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
     gc "code.google.com/p/goncurses"
     "log"
 //    "reflect"
@@ -58,11 +58,12 @@ func sendMsg (inputWin *gc.Window, msgWin *gc.Window) {
         msg := string(inputBuffer)
         to := currentContact
         err := ts.SendMessage(to,msg)
-        printToMsgWindow(msg,msgWin, true)
         if err != nil {
             gc.End()
             log.Fatal("SendMessage failed yo: ",err)
         }
+        printToMsgWindow(msg,msgWin, true)
+        insertMessage("You",currentContact,[]byte(msg),nil)
         inputBuffer = []byte{}
         inputWin.Erase()
     }
@@ -84,7 +85,6 @@ func main() {
         ReadLine:       ts.ConsoleReadLine,
         MessageHandler: recieveMessage,
     }
-    ts.Setup(client)
     stdscr, err := gc.Init()
     if err != nil {
         log.Fatal("Error initializing curses:", err)
@@ -111,6 +111,8 @@ func main() {
             log.Fatal("Password wrong too many times. Exiting...")
         }
     }
+    ts.Setup(client)
+    db = setupDatabase()
 
 
     contacts, err := ts.GetRegisteredContacts()

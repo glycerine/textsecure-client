@@ -1,11 +1,23 @@
 
+AES/CBC/PKCS5Padding
+HMAC-SHA1 
+
+struct {
+      opaque random_iv[16];
+      opaque encrypted_message[...];
+      opaque mac[20];
+} TextSecure_LocalMessage;
 
 
 
-figure out how to use sqlite
-encrypt incomin messages and put them in the database for the associated person
-encrypt outgoing messages and put them in the database for the associated person
+"random_iv" is a random IV.
+"encrypted_message" is the ciphertext of AES-CBC$(plaintext)
+"mac" is HMAC-SHA1 of the ciphertext and IV.
 
+
+ 1) A 128bit symmetric encryption key.
+ 2) A 160bit symmetric MAC key.
+ 3) An ECC keypair.
 
 
 
@@ -33,6 +45,8 @@ MEDIUM PRIORITY:
     Find out why there's occasional runtime errors in the ts library
         Partially figured out, need to write a bug report and file upstream
 
+    Add a "no logging" feature with a bunch of if statements and some configurable global variable
+
 
 LOW PRIORITY:
 
@@ -52,4 +66,7 @@ LOW PRIORITY:
     
     Ask janimo to consider exposing session.go:359 - if he log.Printfs it's gonna screw up the pretty TUI
             log.Printf("Identity of remote %s is not trusted, it may have reinstalled\n. For now delete the file .storage/identity/remote_%s to approve.\n", id, id)
+
+    Decide if I want to put attachments in the database and if I do, in what capacity and how
+
 

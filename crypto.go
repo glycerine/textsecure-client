@@ -5,7 +5,6 @@ package main
 
 import (
     "bufio"
-//    "encoding/hex"
     "log"
     "os"
     "path/filepath"
@@ -13,6 +12,7 @@ import (
 	ts "github.com/janimo/textsecure"
     //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
     gc "code.google.com/p/goncurses"
+    //bcrypt library. Documentation here: https://godoc.org/golang.org/x/crypto/bcrypt
     "golang.org/x/crypto/bcrypt"
 )
 

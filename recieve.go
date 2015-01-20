@@ -13,8 +13,11 @@ func recieveMessage(msg *ts.Message) {
 
     if msg.Message() != "" {
         //fmt.Printf("\r                                               %s%s : %s%s%s\n>", red, getName(msg.Source()), green, msg.Message(), blue)
-        printToMsgWindow(msg.Message(),globalMsgWin,false)
-        //debugLog.Println(msg.Message())
+        if msg.Source() == currentContact {
+            printToMsgWindow(msg.Message(),globalMsgWin,false)
+            insertMessage(msg.Source(),"You",[]byte(msg.Message()),nil)
+        }
+            insertMessage(msg.Source(),"You",[]byte(msg.Message()),nil)
     }
 
     for _, a := range msg.Attachments() {

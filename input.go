@@ -102,23 +102,46 @@ func contactsWindowNavigation(contactsMenuWin * gc.Window, contactMenu * gc.Menu
         rawInput = contactsMenuWin.GetChar()
         c = gc.Char(rawInput)
         if rawInput == gc.KEY_TAB || rawInput == gc.KEY_RETURN {
-            currentContact = getTel(contactMenu.Current(nil).Name())
             return 0
         } else if  c == gc.Char(27) {
             return 1
-        } else if c == gc.Char('j') {
+        } else if c == gc.Char('j') || rawInput == gc.KEY_DOWN {
             contactMenu.Driver(gc.REQ_DOWN)
-        } else if c == gc.Char('k') {
+            changeContact(contactsMenuWin,contactMenu)
+        } else if c == gc.Char('k') || rawInput == gc.KEY_UP {
             contactMenu.Driver(gc.REQ_UP)
+            changeContact(contactsMenuWin,contactMenu)
         } else if c == gc.Char('g') {
             contactMenu.Driver(gc.REQ_FIRST)
+            changeContact(contactsMenuWin,contactMenu)
         } else if c == gc.Char('G') {
             contactMenu.Driver(gc.REQ_LAST)
+            changeContact(contactsMenuWin,contactMenu)
         } else {
-            contactMenu.Driver(gc.DriverActions[rawInput])
+            continue
         }
     }
 }
+
+
+func changeContact(contactsMenuWin * gc.Window, contactMenu * gc.Menu) {
+    globalMsgWin.Erase()
+    currentContact = getTel(contactMenu.Current(nil).Name())
+    rows := getConversation(currentContact)
+    defer rows.Close()
+    var msg string
+    var src string
+    for rows.Next() {
+        rows.Scan(&msg,&src)
+        if src != "You" {
+            printToMsgWindow(msg,globalMsgWin,false)
+        } else {
+            printToMsgWindow(msg,globalMsgWin,true)
+        }
+    }
+    globalMsgWin.Refresh()
+}
+
 
 // Gets password from input
 func getPass() string {
