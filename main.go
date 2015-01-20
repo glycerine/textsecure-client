@@ -144,9 +144,9 @@ func main() {
     //msgWin.MovePrint(0,0,"test")
     //msgWin.Refresh()
 
-    inputWin.Move(0,0)
     currentContact = getTel(contactMenu.Current(nil).Name())
     changeContact(contactsMenuWin,contactMenu)
+    inputWin.Move(0,0)
     go ts.ListenForMessages()
     inputHandler(inputWin, stdscr, contactsMenuWin, contactMenu, msgWin)
     cleanup(menu_items, contactMenu)

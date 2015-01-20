@@ -4,6 +4,14 @@ Many thanks to the people behind golang and all its libraries, ncurses, Rob Thor
 
 ** At the moment nothing is supported, this is still in development and DOES.NOT.WORK **
 
+Screenshot
+----------
+
+![screenshot of textsecure for terminal](https://github.com/f4lk0r/textsecure-client/wiki/screenshots/output.gif)
+
+
+
+
 Installation
 ------------
 
@@ -19,7 +27,7 @@ Before starting the Application for the first time, go into the .config director
 Usage
 -----
 
-This doesn't work yet, there is no usage - BUT SOON IT SHALL WORK HAHAHA BECAUSE NOW YOU CAN SEND MESSAGES HOW GREAT IS THAT!
+This works, it's buggy as all hell and in alpha but you can use it to send and recieve messages. No group support yet, but that's todo.
 
 Discussions
 -----------
