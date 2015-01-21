@@ -104,6 +104,7 @@ func main() {
         ReadLine:       ts.ConsoleReadLine,
         MessageHandler: recieveMessage,
     }
+    ts.Setup(client)
     stdscr, err := gc.Init()
     if err != nil {
         log.Fatal("Error initializing curses:", err)
@@ -111,7 +112,6 @@ func main() {
     defer gc.End()
     configCurses(stdscr)
 
-    ts.Setup(client)
     for i:=0;i<3;i++ {
         doHello(stdscr)
         var locked bool = passphraseUnlock(client)
