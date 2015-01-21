@@ -123,26 +123,6 @@ func contactsWindowNavigation(contactsMenuWin * gc.Window, contactMenu * gc.Menu
     }
 }
 
-
-func changeContact(contactsMenuWin * gc.Window, contactMenu * gc.Menu) {
-    globalMsgWin.Erase()
-    currentContact = getTel(contactMenu.Current(nil).Name())
-    rows := getConversation(currentContact)
-    defer rows.Close()
-    var msg string
-    var src string
-    for rows.Next() {
-        rows.Scan(&msg,&src)
-        if src != "You" {
-            printToMsgWindow(msg,globalMsgWin,false)
-        } else {
-            printToMsgWindow(msg,globalMsgWin,true)
-        }
-    }
-    globalMsgWin.Refresh()
-}
-
-
 // Gets password from input
 func getPass() string {
     gc.Echo(false)

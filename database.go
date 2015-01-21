@@ -15,7 +15,7 @@ import (
 )
 
 var db *sql.DB
-//
+
 //func main() {
 //    db = setupDatabase()
 ////    insertMessage("+12345678910",[]byte("asdfasfasdfasdfasfasasdf"),nil)
@@ -23,10 +23,18 @@ var db *sql.DB
 //    defer rows.Close()
 //    var msg string
 //    var src string
+//    var t time.Time
 //    for rows.Next() {
-//        rows.Scan(&msg,&src)
-//        log.Println(msg)
-//        log.Println(src)
+//        rows.Scan(&msg,&src,&t)
+//        //log.Println(msg)
+//        //log.Println(src)
+//        //log.Println(time.Local())
+//        //log.Println(time.Clock())
+//        if (time.Now()).AddDate(0,0,-6).Before(t) {
+//            log.Println(string([]byte(t.Weekday().String())[0:3]))
+//        } else {
+//            log.Println(t.Local())
+//        }
 //    }
 //}
 
@@ -82,7 +90,7 @@ func insertMessage( source string, dest string, msg []byte, group []byte ) {
 // getConversation gets the messages associated with a contact so they can be displayed in the message window
 func getConversation(source string) *sql.Rows {
     var b bytes.Buffer
-    b.WriteString("select message,source from textsecure where source = '")
+    b.WriteString("select message,source,timeRecieved from textsecure where source = '")
     b.WriteString(source)
     b.WriteString("' or dest = '")
     b.WriteString(source)

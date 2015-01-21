@@ -1,8 +1,6 @@
-# TextSecure Command Line Client
+# TextSecure for Terminal
 
 Many thanks to the people behind golang and all its libraries, ncurses, Rob Thornton for his [goncurses] (https://code.google.com/p/goncurses/) library, @janimo for his [golang textsecure] (https://github.com/janimo/textsecure.git) library, and @mattn for his [go-sqlite3] (https://github.com/mattn/go-sqlite3) driver.
-
-** At the moment nothing is supported, this is still in development and DOES.NOT.WORK **
 
 Screenshot
 ----------
@@ -17,6 +15,26 @@ Installation
     go get github.com/f4lk0r/textsecure-client
 
 For more details, including setting up Go, check out janimo's [wiki] (https://github.com/janimo/textsecure/wiki/Installation)
+
+cd to the directory where the application is located. for example:
+    
+    cd $GOPATH/src/github.com/f4lk0r/textsecure-client
+
+then build the application with go build
+
+    go build
+
+and then modify your configuration settings, such as phone numbers, etc etc
+
+    nano .config/config.yml
+
+and then add your contacts to the application
+
+    nano .config/contacts.yml
+
+and run the application!
+    
+    ./textsecure-client 
 
 Configuration
 -------------
