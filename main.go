@@ -111,6 +111,7 @@ func main() {
     defer gc.End()
     configCurses(stdscr)
 
+    ts.Setup(client)
     for i:=0;i<3;i++ {
         doHello(stdscr)
         var locked bool = passphraseUnlock(client)
@@ -130,7 +131,6 @@ func main() {
             log.Fatal("Password wrong too many times. Exiting...")
         }
     }
-    ts.Setup(client)
     db = setupDatabase()
 
 
