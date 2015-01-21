@@ -8,6 +8,8 @@ import(
     gc "code.google.com/p/goncurses"
 )
 
+var scroll = 0
+
 type newLine struct {
     _cursorX int
     _placer int
@@ -38,12 +40,12 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                 copy(inputBuffer[placer: len(inputBuffer) - 1], inputBuffer[placer + 1:])
                 inputBuffer = inputBuffer[0:len(inputBuffer)-1]
                 placer--;
-                if del != byte('\n') && NLlocate[y]._cursorX > x {
-                    temp := newLine{NLlocate[y]._cursorX - 1, NLlocate[y]._placer - 1}
-                    NLlocate[y] = temp
+                if del != byte('\n') && NLlocate[y+scroll]._cursorX > x {
+                    temp := newLine{NLlocate[y+scroll]._cursorX - 1, NLlocate[y+scroll]._placer - 1}
+                    NLlocate[y+scroll] = temp
                 }
                 //debugLog.Println(inputBuffer)
-            } else if y!=0 {
+            } else if y!=0 {//when x==0 and y!=0
                     inputWin.Move(y - 1, max_x - 1)
                     inputWin.MoveDelChar(y - 1,max_x - 1)
                     del = inputBuffer[placer]
@@ -55,18 +57,18 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             if del == byte('\n') {
                 inputWin.Erase()
                 inputWin.Print(string(inputBuffer))
-                inputWin.Move(y - 1, NLlocate[y - 1]._cursorX)
-                temp, check := NLlocate[y];
+                inputWin.Move(y - 1, NLlocate[y - 1 + scroll]._cursorX)
+                temp, check := NLlocate[y + scroll];
                 var temp_cursor = temp._cursorX
                 var temp_placer = temp._placer
-                if check && NLlocate[y - 1]._cursorX + temp_cursor >= max_x {
-                    _newLine := newLine{NLlocate[y - 1]._cursorX + temp_cursor - max_x , NLlocate[y]._placer - 1}
-                    NLlocate[y] = _newLine
+                if check && NLlocate[y - 1 + scroll]._cursorX + temp_cursor >= max_x {
+                    _newLine := newLine{NLlocate[y - 1 + scroll]._cursorX + temp_cursor - max_x , NLlocate[y + scroll]._placer - 1}
+                    NLlocate[y + scroll] = _newLine
                     delete (NLlocate, y - 1)
                 } else if  check {                                  // check if there are any '\n' this line
                     var largest = -1                                // if yes, select all '\n' and move
                     for i := range NLlocate {                       // placer by 1 and adjust cursor
-                        if i >= y {                                 // accordingly
+                        if i >= y+scroll {                          // accordingly
                             if next_nl,ok := NLlocate[i + 1]; ok {
                                 new_nl := newLine{next_nl._cursorX, next_nl._placer - 1}
                                 NLlocate[i] = new_nl
@@ -77,10 +79,10 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                         }
                     }
                     delete (NLlocate, largest)                      // delete last map entry
-                    _newLine := newLine{NLlocate[y - 1]._cursorX + temp_cursor , NLlocate[y - 1]._placer + temp_placer - 1}
-                    NLlocate[y - 1] = _newLine
+                    _newLine := newLine{NLlocate[y - 1+scroll]._cursorX + temp_cursor , NLlocate[y - 1+scroll]._placer + temp_placer - 1}
+                    NLlocate[y - 1+scroll] = _newLine
                 } else {
-                    delete (NLlocate, y - 1)
+                    delete (NLlocate, y - 1+scroll)
                 }
             }
         } else if c == gc.KEY_PAGEDOWN {
@@ -103,7 +105,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                 placer--
             }
             if len(inputBuffer) > 0 && inputBuffer[placer + 1] == byte('\n') {
-                inputWin.Move(y - 1, NLlocate[y - 1]._cursorX)
+                inputWin.Move(y - 1, NLlocate[y - 1+scroll]._cursorX)
             }
         } else if c == gc.KEY_RIGHT {
             y,x := inputWin.CursorYX()
@@ -118,6 +120,23 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             }
         } else if c == gc.KEY_UP {
             y,x := inputWin.CursorYX()
+            if y == 0 && placer == 0 {
+                continue
+            } else if y==0 && scroll > 0 {
+                inputWin.Move(0,x)
+                inputWin.Scroll(-1)
+                scroll -= 1
+                if(NLlocate[y-2+scroll]._placer != 0) {
+                    inputWin.Erase()
+                    inputWin.Print(string(inputBuffer[(NLlocate[y-2+scroll]._placer):]))
+                } else if (placer-max_x-x >0) {
+                    inputWin.Erase()
+                    inputWin.Print(string(inputBuffer[(placer-x-max_x):]))
+                } else {
+                    inputWin.Erase()
+                    inputWin.Print(string(inputBuffer))
+                }
+            }
             if y != 0{
                 inputWin.Move(y-1,x)
                 placer -= max_x
@@ -125,22 +144,31 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                     placer =0
                 }
             }
-            if NLlocate[y - 1]._placer != 0 {
-                if NLlocate[y-1]._cursorX < x {
-                    placer = NLlocate[y-1]._placer
-                    inputWin.Move(y - 1, NLlocate[y - 1]._cursorX)
-                } else if y != 0 && x != 0{
-                    placer = NLlocate[y-1]._placer - (NLlocate[y-1]._cursorX - x)
+            if NLlocate[y - 1 +scroll]._placer != 0 {
+                if NLlocate[y-1+scroll]._cursorX < x {
+                    placer = NLlocate[y-1+scroll]._placer
+                    inputWin.Move(y - 1, NLlocate[y - 1+scroll]._cursorX)
+                } else {
+                    placer = NLlocate[y-1+scroll]._placer - (NLlocate[y - 1 + scroll]._cursorX - x)
                 }
             }
         } else if c == gc.KEY_DOWN {
             y,x := inputWin.CursorYX()
             if y != max_y {
                 inputWin.Move(y+1,x)
-                if NLlocate[y]._placer == 0 {
+                if NLlocate[y+scroll]._placer == 0 {
                     placer += max_x
                 } else {
-                    placer = NLlocate[y]._placer + x + 1
+                    placer = NLlocate[y+scroll]._placer + x + 1
+                }
+            } else if y == max_y {
+                inputWin.Scroll(1)
+                scroll += 1
+                inputWin.Move(max_y-1,x)
+                if NLlocate[y+scroll]._placer == 0 {
+                    placer += max_x
+                } else {
+                    placer = NLlocate[y+scroll]._placer + x + 1
                 }
             }
             if placer >= len(inputBuffer) {
@@ -166,9 +194,12 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
         } else if rawInput == gc.KEY_SRIGHT {
             y,x := inputWin.CursorYX()
             if inputBuffer == nil || placer == len(inputBuffer) - 1 {
+                if y == max_y-1 {
+                    scroll++
+                }
                 inputWin.Print("\n")
                 temp := newLine{x, placer}
-                NLlocate[y] = temp
+                NLlocate[y+scroll] = temp
                 placer++
                 inputBuffer = append(inputBuffer,byte('\n'))
             } else {
@@ -179,10 +210,10 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                 inputWin.Print(string(inputBuffer))
                 temp := newLine {x, placer}
                 placer ++
-                nextholder, check := NLlocate[y + 1]
+                nextholder, check := NLlocate[y + 1 + scroll]
                 if check {
                     for i:= range NLlocate {
-                        if i == y {
+                        if i == y + scroll {
                             _newLine := newLine{NLlocate[i]._cursorX + 1 - x, NLlocate[i]._placer + 1}
                             nextholder := NLlocate[i + 1]
                             _ = nextholder
@@ -194,7 +225,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                         }
                     }
                 }
-                NLlocate[y] = temp
+                NLlocate[y+scroll] = temp
                 inputWin.Move(y + 1, 0)
             }
         } else if rawInput == gc.KEY_SLEFT {
@@ -206,31 +237,28 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
             } else {
                 inputWin.Erase()
                 inputBuffer = append(inputBuffer,byte(c))
-                debugLog.Println(placer)
                 copy(inputBuffer[placer + 1:], inputBuffer[placer:])
                 inputBuffer[placer + 1] = byte(c)
                 inputWin.Print(string(inputBuffer))
                 for i := range NLlocate {
-                    if i > y {
+                    if i > y+scroll {
                         tempLine := newLine{NLlocate[i]._cursorX, NLlocate[i]._placer + 1}
                         NLlocate[i] = tempLine
                     }
                 }
-            }
-            if NLlocate[y]._cursorX >= x {
-                if NLlocate[y]._cursorX == max_x {
-                    copy(inputBuffer[NLlocate[y]._placer: len(inputBuffer) - 1], inputBuffer[NLlocate[y]._placer + 1:])
-                    inputBuffer = inputBuffer[0:len(inputBuffer)-1]
-                    delete (NLlocate, y)
-                } else {
-                    temp := newLine{NLlocate[y]._cursorX + 1, NLlocate[y]._placer + 1}
-                    NLlocate[y] = temp
+                if NLlocate[y+scroll]._cursorX >= x {
+                    if NLlocate[y+scroll]._cursorX == max_x {
+                        copy(inputBuffer[NLlocate[y+scroll]._placer: len(inputBuffer) - 1], inputBuffer[NLlocate[y+scroll]._placer + 1:])
+                        inputBuffer = inputBuffer[0:len(inputBuffer)-1]
+                        delete (NLlocate, y)
+                    } else {
+                        temp := newLine{NLlocate[y+scroll]._cursorX + 1, NLlocate[y+scroll]._placer + 1}
+                        NLlocate[y+scroll] = temp
+                    }
                 }
             }
             placer++
             inputWin.Move(y,x + 1)
-
-            //debugLog.Println(inputBuffer)
         }
     }
 }

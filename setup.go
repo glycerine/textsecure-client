@@ -93,6 +93,7 @@ func createMainWindows(stdscr *gc.Window) (*gc.Window, *gc.Window, *gc.Window, *
         log.Fatal("Failed to create the inputWin Window:",err)
     }
 
+    inputWin.ScrollOk(true)
     inputWin.Keypad(true)
     msgWin.ScrollOk(true)
 
