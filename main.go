@@ -16,7 +16,7 @@ import (
 var debugLog = startDebugLogger()
 var inputBuffer []byte
 var currentContact string
-
+var placer = -1
 
 // getName returns the local contact name corresponding to a phone number,
 // or failing to find a contact the phone number itself

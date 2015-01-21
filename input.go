@@ -15,7 +15,6 @@ type newLine struct {
 
 // handles keyboard input
 func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.Window, contactMenu *gc.Menu) {
-    var placer = -1
     var NLlocate = map[int]newLine {
     }
     var c gc.Char
@@ -53,7 +52,7 @@ func inputHandler( inputWin *gc.Window, stdscr *gc.Window, contactsMenuWin *gc.W
                     inputBuffer = inputBuffer[0:len(inputBuffer)-1]
                     //debugLog.Println(inputBuffer)
                     placer--;
-                }             
+                }
             if del == byte('\n') {
                 inputWin.Erase()
                 inputWin.Print(string(inputBuffer))
