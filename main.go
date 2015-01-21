@@ -12,7 +12,6 @@ import (
 //    "reflect"
 )
 
-
 //Global variables that make things way more convenient, rather than passing copies all the time
 var(
 //    contactsWin *gc.Window
@@ -29,6 +28,7 @@ var(
     msgWinSize_x int
     msgWinSize_y int
     pass string
+    placer = -1
 )
 
 // getName returns the local contact name corresponding to a phone number,
