@@ -10,6 +10,9 @@ import (
     gc "code.google.com/p/goncurses"
     "log"
 //    "reflect"
+    "time"
+    "strconv"
+    "bytes"
 )
 
 //Global variables that make things way more convenient, rather than passing copies all the time
@@ -62,7 +65,23 @@ func sendMsg (inputWin *gc.Window, msgWin *gc.Window) {
             gc.End()
             log.Fatal("SendMessage failed yo: ",err)
         }
-        printToMsgWindow(msg,msgWin, true)
+
+        var b bytes.Buffer
+        t := time.Now()
+        if t.Hour() < 10 {
+            b.WriteString("0")
+        }
+        b.WriteString(strconv.Itoa(t.Hour()))
+        b.WriteString(":")
+        if t.Minute() < 10 {
+            b.WriteString("0")
+        }
+        b.WriteString(strconv.Itoa(t.Minute()))
+        b.WriteString(": ")
+        b.WriteString(msg)
+
+        printToMsgWindow(b.String(),msgWin, true)
+        b.Reset()
         insertMessage("You",currentContact,[]byte(msg),nil)
         inputBuffer = []byte{}
         inputWin.Erase()

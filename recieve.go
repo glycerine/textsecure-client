@@ -7,6 +7,9 @@ import(
     "log"
     "io/ioutil"
     ts "github.com/janimo/textsecure"
+    "bytes"
+    "time"
+    "strconv"
 )
 
 func recieveMessage(msg *ts.Message) {
@@ -14,7 +17,21 @@ func recieveMessage(msg *ts.Message) {
     if msg.Message() != "" {
         //fmt.Printf("\r                                               %s%s : %s%s%s\n>", red, getName(msg.Source()), green, msg.Message(), blue)
         if msg.Source() == currentContact {
-            printToMsgWindow(msg.Message(),globalMsgWin,false)
+            var b bytes.Buffer
+            t := time.Now()
+            if t.Hour() < 10 {
+                b.WriteString("0")
+            }
+            b.WriteString(strconv.Itoa(t.Hour()))
+            b.WriteString(":")
+            if t.Minute() < 10 {
+                b.WriteString("0")
+            }
+            b.WriteString(strconv.Itoa(t.Minute()))
+            b.WriteString(": ")
+            b.WriteString(msg.Message())
+
+            printToMsgWindow(b.String(),globalMsgWin, false)
             insertMessage(msg.Source(),"You",[]byte(msg.Message()),nil)
         }
             insertMessage(msg.Source(),"You",[]byte(msg.Message()),nil)
