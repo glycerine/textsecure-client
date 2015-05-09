@@ -11,7 +11,7 @@ import (
     //janimo's textsecure library. Documentation here: https://godoc.org/github.com/janimo/textsecure
 	ts "github.com/janimo/textsecure"
     //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
-    gc "code.google.com/p/goncurses"
+    gc "github.com/rthornton128/goncurses"
     //bcrypt library. Documentation here: https://godoc.org/golang.org/x/crypto/bcrypt
     "golang.org/x/crypto/bcrypt"
 )
