@@ -1,24 +1,29 @@
 # TextSecure for Terminal
 
+Status
+-------
+Currently, this needs to be ported to the latest version of janimo's API and does not work. It is on my backburner to get it up and running again... Pull requests appreciated!
+
+
 Many thanks to the people behind golang and all its libraries, ncurses, Rob Thornton for his [goncurses] (https://code.google.com/p/goncurses/) library, @janimo for his [golang textsecure] (https://github.com/janimo/textsecure.git) library, and @mattn for his [go-sqlite3] (https://github.com/mattn/go-sqlite3) driver.
 
 Screenshot
 ----------
 
-![screenshot of textsecure for terminal](https://github.com/f4lk0r/textsecure-client/wiki/screenshots/output.gif)
+![screenshot of textsecure for terminal](https://github.com/f41c0r/textsecure-client/wiki/screenshots/output.gif)
 
 Hint: click on the gif for full screen better quality image
 
 Installation
 ------------
 
-    go get github.com/f4lk0r/textsecure-client
+    go get github.com/f41c0r/textsecure-client
 
 For more details, including setting up Go, check out janimo's [wiki] (https://github.com/janimo/textsecure/wiki/Installation)
 
 cd to the directory where the application is located. for example:
     
-    cd $GOPATH/src/github.com/f4lk0r/textsecure-client
+    cd $GOPATH/src/github.com/f41c0r/textsecure-client
 
 then build the application with go build
 
