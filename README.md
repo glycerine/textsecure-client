@@ -1,9 +1,8 @@
 # TextSecure for Terminal
 
-Status
+Current Status
 -------
-Currently, this needs to be ported to the latest version of janimo's API and does not work. It is on my backburner to get it up and running again... Pull requests appreciated!
-
+As of 05/13/2015 this is working.
 
 Many thanks to the people behind golang and all its libraries, ncurses, Rob Thornton for his [goncurses] (https://code.google.com/p/goncurses/) library, @janimo for his [golang textsecure] (https://github.com/janimo/textsecure.git) library, and @mattn for his [go-sqlite3] (https://github.com/mattn/go-sqlite3) driver.
 

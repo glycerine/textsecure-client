@@ -9,7 +9,6 @@ import (
 //    //go ncurses library. Documentation here: https://godoc.org/code.google.com/p/goncurses
     gc "github.com/rthornton128/goncurses"
     "log"
-//    "reflect"
     "time"
     "strconv"
     "bytes"
@@ -97,14 +96,48 @@ func cleanup (menu_items []*gc.MenuItem, contactMenu *gc.Menu) {
     contactMenu.Free()
 }
 
+// get Config file, pass to the ts library
+func getConfig() (*ts.Config, error) {
+    return ts.ReadConfig(".config/config.yml")
+}
+
+// get contacts file, pass to the ts library
+func getLocalContacts() ([]ts.Contact, error) {
+        return ts.ReadContacts(".config/contacts.yml")
+}
+
+// function to read the verification code stolen from janimo
+func readLine(prompt string) string {
+    stdscr := gc.StdScr()
+    y,x := stdscr.MaxYX()
+    stdscr.Println()
+    stdscr.MovePrintln((2*int(y/3))-2,int(x/2)-16,"Please enter the verification code:")
+    stdscr.Move((2*int(y/3))-1,int(x/2)-16)
+
+    pass = getPass()
+    return pass
+}
+
+// get Verification Code, pass to ts library
+func getVerificationCode() string {
+        return readLine("Enter verification code>")
+}
+
+// Gets the passphrase to the chat database from the user
+func passphraseUnlock() string {
+    stdscr := gc.StdScr()
+    y,x := stdscr.MaxYX()
+    stdscr.Println()
+    stdscr.MovePrintln((2*int(y/3))-2,int(x/2)-16,"Please enter your passphrase:")
+    stdscr.Move((2*int(y/3))-1,int(x/2)-16)
+
+    pass = getPass()
+    return pass
+}
+
+
 // creates a curses based TUI for the textsecure library
 func main() {
-    client := &ts.Client{
-        RootDir:        ".",
-        ReadLine:       ts.ConsoleReadLine,
-        MessageHandler: recieveMessage,
-    }
-    ts.Setup(client)
     stdscr, err := gc.Init()
     if err != nil {
         log.Fatal("Error initializing curses:", err)
@@ -112,28 +145,20 @@ func main() {
     defer gc.End()
     configCurses(stdscr)
 
-    for i:=0;i<3;i++ {
-        doHello(stdscr)
-        var locked bool = passphraseUnlock(client)
-        if locked == false {
-            stdscr.ColorOn(1)
-            stdscr.MovePrint(0,0,"Password incorrect, hit any key...")
-            stdscr.ColorOff(1)
-            stdscr.GetChar()
-            stdscr.Clear()
-            stdscr.Refresh()
-        } else {
-            stdscr.Clear()
-            stdscr.Refresh()
-            break
-        }
-        if i == 2 {
-            log.Fatal("Password wrong too many times. Exiting...")
-        }
+    client := &ts.Client{
+        GetConfig:           getConfig,
+        GetLocalContacts:    getLocalContacts,
+        GetVerificationCode: getVerificationCode,
+        GetStoragePassword:  passphraseUnlock,
+        MessageHandler:      recieveMessage,
     }
+    err = ts.Setup(client)
+    if err != nil {
+        log.Fatal("Could not initialize textsecure library", err)
+    }
+
     db = setupDatabase()
-
-
+    
     contacts, err := ts.GetRegisteredContacts()
     if err != nil {
         log.Fatal("Could not get contacts: %s\n", err)
@@ -160,8 +185,6 @@ func main() {
     inputBorderWin.Refresh()
     msgWin.Refresh()
     msgWinSize_y,msgWinSize_x = msgWin.MaxYX()
-    //msgWin.MovePrint(0,0,"test")
-    //msgWin.Refresh()
 
     currentContact = getTel(contactMenu.Current(nil).Name())
     changeContact(contactsMenuWin,contactMenu)
