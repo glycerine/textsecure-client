@@ -135,6 +135,10 @@ func passphraseUnlock() string {
     return pass
 }
 
+func registrationDone() {
+        debugLog.Println("Registration done.")
+}
+
 
 // creates a curses based TUI for the textsecure library
 func main() {
@@ -151,6 +155,7 @@ func main() {
         GetVerificationCode: getVerificationCode,
         GetStoragePassword:  passphraseUnlock,
         MessageHandler:      recieveMessage,
+        RegistrationDone:    registrationDone,
     }
     err = ts.Setup(client)
     if err != nil {
@@ -189,7 +194,7 @@ func main() {
     currentContact = getTel(contactMenu.Current(nil).Name())
     changeContact(contactsMenuWin,contactMenu)
     inputWin.Move(0,0)
-    go ts.ListenForMessages()
+    go ts.StartListening()
     inputHandler(inputWin, stdscr, contactsMenuWin, contactMenu, msgWin)
     cleanup(menu_items, contactMenu)
 }

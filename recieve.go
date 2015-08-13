@@ -10,6 +10,7 @@ import(
     "bytes"
     "time"
     "strconv"
+    "io"
 )
 
 func recieveMessage(msg *ts.Message) {
@@ -43,12 +44,16 @@ func recieveMessage(msg *ts.Message) {
 }
 
 // Recieves incoming attachments
-func handleAttachment(src string, b []byte) {
+func handleAttachment(src string, r io.Reader) {
     f, err := ioutil.TempFile(".", "TextSecure_Attachment")
     if err != nil {
         debugLog.Println(err)
         return
     }
-    log.Printf("Saving attachment of length %d from %s to %s", len(b), src, f.Name())
-    f.Write(b)
+    l, err := io.Copy(f, r)
+    if err != nil {
+        debugLog.Println(err)
+        return
+    }
+    log.Printf("Saving attachment of length %d from %s to %s", l, src, f.Name())
 }
